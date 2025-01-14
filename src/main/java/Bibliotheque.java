@@ -1,270 +1,390 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.table.*;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 
-public class Bibliotheque extends JFrame {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class Bibliotheque {
 
-	public Bibliotheque() {
-		// Créer la fenêtre principale
-		JFrame frame = new JFrame("Application de Bibliothèque");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(800, 600);
-		frame.setLayout(new BorderLayout());
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new FenetreBienvenue().setVisible(true));
+    }
 
-		// Ajouter la barre de menus
-		JMenuBar menuBar = new JMenuBar();
-		JMenu menuFichier = new JMenu("Fichier");
-		JMenuItem itemQuitter = new JMenuItem("Quitter");
-		itemQuitter.addActionListener(e -> System.exit(0));
-		menuFichier.add(itemQuitter);
-		menuBar.add(menuFichier);
+    // Fenêtre de bienvenue
+    static class FenetreBienvenue extends JFrame {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 
-		JMenu menuAide = new JMenu("Aide");
-		JMenuItem itemAPropos = new JMenuItem("À propos");
-		itemAPropos.addActionListener(e -> JOptionPane.showMessageDialog(frame, "Application de Bibliothèque - Version 1.0"));
-		menuAide.add(itemAPropos);
-		menuBar.add(menuAide);
+		public FenetreBienvenue() {
+            setTitle("Bienvenue dans la Bibliothèque");
+            setSize(1280, 720);
+            setDefaultCloseOperation(EXIT_ON_CLOSE);
+            setLocationRelativeTo(null);
 
-		frame.setJMenuBar(menuBar);
+            // Interface
+            JLabel bienvenue = new JLabel("Bienvenue dans l'application Bibliothèque", JLabel.CENTER);
+            JButton btnAjout = new JButton("Ajouter un document");
+            JButton btnRecherche = new JButton("Rechercher un document");
+            JButton btnLister = new JButton("Lister les documents");
+            JButton btnAjoutEditeur = new JButton("Ajouter un éditeur");
+            JButton btnModifierEditeur = new JButton("Modifier un éditeur");
+            JButton btnSupprimerEditeur = new JButton("Supprimer un éditeur");
 
-		// Ajouter des onglets
-		JTabbedPane tabbedPane = new JTabbedPane();
-		JPanel panelAccueil = createAccueilPanel();
-		JPanel panelLivres = createDocumentPanel();
-		JPanel panelFormulaire = createFormulairePanel();
-		JPanel panelRecherche = createRecherchePanel();
+            // Listeners
+            btnAjout.addActionListener(e -> {
+                new FenetreAjoutDocument().setVisible(true);
+                dispose();
+            });
+            btnRecherche.addActionListener(e -> {
+                new FenetreRechercheDocument().setVisible(true);
+                dispose();
+            });
+            btnLister.addActionListener(e -> {
+                new FenetreListeDocuments().setVisible(true);
+                dispose();
+            });
+            btnAjoutEditeur.addActionListener(e -> {
+                new FenetreAjoutEditeur().setVisible(true);
+                dispose();
+            });
+            btnModifierEditeur.addActionListener(e -> {
+                new FenetreModifierEditeur().setVisible(true);
+                dispose();
+            });
+            btnSupprimerEditeur.addActionListener(e -> {
+                new FenetreSupprimerEditeur().setVisible(true);
+                dispose();
+            });
 
-		tabbedPane.addTab("Accueil", panelAccueil);
-		tabbedPane.addTab("Liste des Documents", panelLivres);
-		tabbedPane.addTab("Ajouter un Document", panelFormulaire);
-		tabbedPane.addTab("Rechercher un document", panelRecherche);
+            // Layout
+            setLayout(new BorderLayout());
+            add(bienvenue, BorderLayout.CENTER);
 
-		frame.add(tabbedPane, BorderLayout.CENTER);
+            JPanel panelButtons = new JPanel();
+            panelButtons.add(btnAjout);
+            panelButtons.add(btnRecherche);
+            panelButtons.add(btnLister);
+            panelButtons.add(btnAjoutEditeur);
+            panelButtons.add(btnModifierEditeur);
+            panelButtons.add(btnSupprimerEditeur);
+            add(panelButtons, BorderLayout.SOUTH);
+        }
+    }
 
-		// Afficher la fenêtre
-		frame.setVisible(true);
-	}
+    // Fenêtre pour ajouter un document
+    static class FenetreAjoutDocument extends JFrame {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 
-	// Méthode pour créer le panneau d'accueil
-	private JPanel createAccueilPanel() {
-		JPanel panel = new JPanel(new BorderLayout());
-		JLabel label = new JLabel("Bienvenue", SwingConstants.CENTER);
-		label.setFont(new Font("Arial", Font.BOLD, 25));
-		panel.add(label, BorderLayout.CENTER);
-		return panel;
-	}
+		public FenetreAjoutDocument() {
+            setTitle("Ajouter un document");
+            setSize(400, 300);
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            setLocationRelativeTo(null);
 
-	// Méthode pour créer le panneau des livres (tableau)
-	private JPanel createDocumentPanel() {
-		JPanel panel = new JPanel(new BorderLayout());
-		String[] columnNames = {"Titre", "Stock", "ID", "Prix", "Date de publication"};
-		Object[][] data = {
-				{"1", "1984", "George Orwell", "1949"},
-				{"2", "Le Seigneur des Anneaux", "J.R.R. Tolkien", "1954"},
-				{"3", "Harry Potter", "J.K. Rowling", "1997"}
-		};
+            // Interface
+            JLabel lblTitre = new JLabel("Titre:");
+            JTextField txtTitre = new JTextField(20);
 
-		JTable table = new JTable(new DefaultTableModel(data, columnNames));
-		JScrollPane scrollPane = new JScrollPane(table);
-		panel.add(scrollPane, BorderLayout.CENTER);
+            JLabel lblDate = new JLabel("Date de publication (YYYY-MM-DD):");
+            JTextField txtDate = new JTextField(10);
 
-		return panel;
-	}
-	
-	private JPanel createRecherchePanel() {
-		JPanel panel = new JPanel(new BorderLayout());
+            JLabel lblStock = new JLabel("Stock:");
+            JTextField txtStock = new JTextField(5);
 
-        // Titre principal
-        JLabel lblTitre = new JLabel("Bibliothèque municipale", SwingConstants.CENTER);
-        lblTitre.setBounds(200, 10, 500, 30);
-        lblTitre.setFont(new Font("Arial", Font.BOLD, 18));
-        lblTitre.setForeground(Color.WHITE);
+            JLabel lblPrix = new JLabel("Prix:");
+            JTextField txtPrix = new JTextField(10);
 
-        // En-tête
-        JPanel header = new JPanel();
-        header.setLayout(null);
-        header.setBounds(0, 0, 900, 50);
-        header.setBackground(new Color(70, 150, 140));
-        header.add(lblTitre);
+            JLabel lblEditeur = new JLabel("ID Editeur:");
+            JTextField txtEditeur = new JTextField(5);
 
-        // Champs de recherche
-        JLabel lblRecherche = new JLabel("Recherche");
-        lblRecherche.setBounds(50, 70, 100, 25);
-        JTextField txtRecherche = new JTextField();
-        txtRecherche.setBounds(150, 70, 150, 25);
+            JButton btnAjouter = new JButton("Ajouter");
+            JButton btnRetour = new JButton("Retour");
 
-        JLabel lblType = new JLabel("Type (dvd,cd,livre)");
-        lblType.setBounds(350, 70, 150, 25);
-        JComboBox<String> cbType = new JComboBox<>(new String[]{"Livre", "CD", "DVD"});
-        cbType.setBounds(500, 70, 150, 25);
+            // Actions
+            btnAjouter.addActionListener(e -> {
+                String titre = txtTitre.getText();
+                String datePublication = txtDate.getText();
+                int stock = Integer.parseInt(txtStock.getText());
+                double prix = Double.parseDouble(txtPrix.getText());
+                int idEditeur = Integer.parseInt(txtEditeur.getText());
 
-        JLabel lblGenre = new JLabel("Genre");
-        lblGenre.setBounds(50, 110, 150, 25);
-        JComboBox<String> cbGenre = new JComboBox<>(new String[]{"Roman", "Animation", "Aventure"});
-        cbGenre.setBounds(150, 110, 150, 25);
+                String query = "INSERT INTO Document (Titre, DatePublication, Stock, Prix, idEditeur) VALUES (?, ?, ?, ?, ?)";
+                try (Connection conn = DatabaseManager.getConnection();
+                     PreparedStatement stmt = conn.prepareStatement(query)) {
 
-        JLabel lblAge = new JLabel("Âge (adulte, enfant)");
-        lblAge.setBounds(350, 110, 150, 25);
-        JComboBox<String> cbAge = new JComboBox<>(new String[]{"Adulte", "Enfant"});
-        cbAge.setBounds(500, 110, 150, 25);
+                    stmt.setString(1, titre);
+                    stmt.setDate(2, Date.valueOf(datePublication));
+                    stmt.setInt(3, stock);
+                    stmt.setDouble(4, prix);
+                    stmt.setInt(5, idEditeur);
+                    stmt.executeUpdate();
 
-        // Informations supplémentaires
-        JLabel lblStock = new JLabel("En stock");
-        lblStock.setBounds(50, 170, 100, 25);
-        JTextField txtStock = new JTextField();
-        txtStock.setBounds(150, 170, 150, 25);
+                    JOptionPane.showMessageDialog(this, "Document ajouté avec succès !");
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout : " + ex.getMessage());
+                }
+            });
 
-        JLabel lblAgeTexte = new JLabel("Âge");
-        lblAgeTexte.setBounds(350, 170, 100, 25);
-        JTextField txtAge = new JTextField();
-        txtAge.setBounds(500, 170, 150, 25);
+            btnRetour.addActionListener(e -> {
+                new FenetreBienvenue().setVisible(true);
+                dispose();
+            });
 
-        JLabel lblIDUsager = new JLabel("Id usager");
-        lblIDUsager.setBounds(50, 210, 100, 25);
-        JTextField txtIDUsager = new JTextField();
-        txtIDUsager.setBounds(150, 210, 150, 25);
+            // Layout
+            setLayout(new GridLayout(6, 2));
+            add(lblTitre); add(txtTitre);
+            add(lblDate); add(txtDate);
+            add(lblStock); add(txtStock);
+            add(lblPrix); add(txtPrix);
+            add(lblEditeur); add(txtEditeur);
+            add(btnAjouter); add(btnRetour);
+        }
+    }
 
-        JLabel lblDateDebut = new JLabel("Date début prêt");
-        lblDateDebut.setBounds(350, 210, 100, 25);
-        JTextField txtDateDebut = new JTextField();
-        txtDateDebut.setBounds(500, 210, 150, 25);
+    // Fenêtre pour rechercher un document
+    static class FenetreRechercheDocument extends JFrame {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 
-        JLabel lblIDLivre = new JLabel("ID Livre");
-        lblIDLivre.setBounds(50, 250, 100, 25);
-        JTextField txtIDLivre = new JTextField();
-        txtIDLivre.setBounds(150, 250, 150, 25);
+		public FenetreRechercheDocument() {
+            setTitle("Rechercher un document");
+            setSize(600, 400);
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            setLocationRelativeTo(null);
 
-        JLabel lblDateFin = new JLabel("Date fin prêt");
-        lblDateFin.setBounds(350, 250, 100, 25);
-        JTextField txtDateFin = new JTextField();
-        txtDateFin.setBounds(500, 250, 150, 25);
+            // Interface
+            JLabel lblTitre = new JLabel("Titre:");
+            JTextField txtTitre = new JTextField(20);
+            JButton btnRechercher = new JButton("Rechercher");
+            JButton btnRetour = new JButton("Retour");
+            JTextArea txtResultat = new JTextArea();
+            txtResultat.setEditable(false);
 
-        // Bouton prêt
-        JButton btnPret = new JButton("Prêt");
-        btnPret.setBounds(350, 300, 100, 30);
-        btnPret.setBackground(new Color(70, 150, 140));
-        btnPret.setForeground(Color.WHITE);
+            btnRechercher.addActionListener(e -> {
+                String titre = txtTitre.getText();
+                List<String > result = DocumentManager.rechercherDocumentParTitre(titre);
+                txtResultat.setText(result.toString());
+            });
 
-        // Image du livre
-        JLabel lblImage = new JLabel();
-        lblImage.setBounds(700, 70, 150, 200);
-        ImageIcon image = new ImageIcon("martine.jpg"); // Ajoute ton image ici
-        lblImage.setIcon(new ImageIcon(image.getImage().getScaledInstance(150, 200, Image.SCALE_SMOOTH)));
+            btnRetour.addActionListener(e -> {
+                new FenetreBienvenue().setVisible(true);
+                dispose();
+            });
 
-        // Ajouter les composants à la fenêtre
-        panel.add(header);
-        panel.add(lblRecherche);
-        panel.add(txtRecherche);
-        panel.add(lblType);
-        panel.add(cbType);
-        panel.add(lblGenre);
-        panel.add(cbGenre);
-        panel.add(lblAge);
-        panel.add(cbAge);
-        panel.add(lblStock);
-        panel.add(txtStock);
-        panel.add(lblAgeTexte);
-        panel.add(txtAge);
-        panel.add(lblIDUsager);
-        panel.add(txtIDUsager);
-        panel.add(lblDateDebut);
-        panel.add(txtDateDebut);
-        panel.add(lblIDLivre);
-        panel.add(txtIDLivre);
-        panel.add(lblDateFin);
-        panel.add(txtDateFin);
-        panel.add(btnPret);
-        panel.add(lblImage);
+            // Layout
+            setLayout(new BorderLayout());
+            JPanel panelRecherche = new JPanel();
+            panelRecherche.add(lblTitre); panelRecherche.add(txtTitre); panelRecherche.add(btnRechercher);
+            add(panelRecherche, BorderLayout.NORTH);
+            add(new JScrollPane(txtResultat), BorderLayout.CENTER);
+            add(btnRetour, BorderLayout.SOUTH);
+        }
+    }
 
-        // Style du fond
-        panel.setVisible(true);
-    
-		return panel;
-	}
+    // Fenêtre pour lister tous les documents
+    static class FenetreListeDocuments extends JFrame {
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 
-	private JPanel createFormulairePanel() {
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(4, 2, 10, 10));
+		public FenetreListeDocuments() {
+            setTitle("Liste des documents");
+            setSize(600, 400);
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            setLocationRelativeTo(null);
 
-		JLabel lblTitre = new JLabel("Titre:");
-		JTextField txtTitre = new JTextField();
+            // Interface
+            JTextArea txtResultat = new JTextArea();
+            txtResultat.setEditable(false);
+            JButton btnRetour = new JButton("Retour");
 
-		JLabel lblAnnee = new JLabel("Année:");
-		JTextField txtAnnee = new JTextField();
+            btnRetour.addActionListener(e -> {
+                new FenetreBienvenue().setVisible(true);
+                dispose();
+            });
+
+            // Charger les documents
+            String query = "SELECT * FROM Document";
+            try (Connection conn = DatabaseManager.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
+
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    txtResultat.append("ID: " + rs.getInt("idDoc") + ", Titre: " + rs.getString("Titre") +
+                            ", Date: " + rs.getDate("DatePublication") + ", Stock: " + rs.getInt("Stock") +
+                            ", Prix: " + rs.getDouble("Prix") + "\n");
+                }
+            } catch (SQLException ex) {
+                txtResultat.setText("Erreur : " + ex.getMessage());
+            }
+
+            // Layout
+            setLayout(new BorderLayout());
+            add(new JScrollPane(txtResultat), BorderLayout.CENTER);
+            add(btnRetour, BorderLayout.SOUTH);
+        }
+    }
 		
-		JLabel stock = new JLabel("Stock:");
-		JTextField txtStock = new JTextField();
+		static class FenetreAjoutEditeur extends JFrame {
+	        /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
 
-		JLabel lblAuteur = new JLabel("Auteur:");
-		JTextField txtAuteur = new JTextField();
+			public FenetreAjoutEditeur() {
+	            setTitle("Ajouter un éditeur");
+	            setSize(400, 300);
+	            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+	            setLocationRelativeTo(null);
 
-		JLabel price = new JLabel("Prix:");
-		JTextField txtPrice = new JTextField();
+	            JLabel lblId = new JLabel("ID Éditeur:");
+	            JTextField txtId = new JTextField(10);
+
+	            JLabel lblNom = new JLabel("Nom:");
+	            JTextField txtNom = new JTextField(20);
+
+	            JLabel lblAdresse = new JLabel("Adresse:");
+	            JTextField txtAdresse = new JTextField(20);
+
+	            JLabel lblPays = new JLabel("Pays:");
+	            JTextField txtPays = new JTextField(20);
+
+	            JButton btnAjouter = new JButton("Ajouter");
+	            JButton btnRetour = new JButton("Retour");
+
+	            btnAjouter.addActionListener(e -> {
+	                int id = Integer.parseInt(txtId.getText());
+	                String nom = txtNom.getText();
+	                String adresse = txtAdresse.getText();
+	                String pays = txtPays.getText();
+
+	               EditeurManager.ajouterEditeur(id, adresse, pays, nom);
+	            });
+	            btnRetour.addActionListener(e -> {
+	                new FenetreBienvenue().setVisible(true);
+	                dispose();
+	            });
+
+	            setLayout(new GridLayout(5, 2));
+	            add(lblId); add(txtId);
+	            add(lblNom); add(txtNom);
+	            add(lblAdresse); add(txtAdresse);
+	            add(lblPays); add(txtPays);
+	            add(btnAjouter); add(btnRetour);
+	        }
+	    }
+
+	    static class FenetreModifierEditeur extends JFrame {
+	        /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			public FenetreModifierEditeur() {
+	            setTitle("Modifier un éditeur");
+	            setSize(400, 300);
+	            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+	            setLocationRelativeTo(null);
+
+	            JLabel lblId = new JLabel("ID Éditeur:");
+	            JTextField txtId = new JTextField(10);
+
+	            JLabel lblNom = new JLabel("Nouveau nom:");
+	            JTextField txtNom = new JTextField(20);
+
+	            JLabel lblAdresse = new JLabel("Nouvelle adresse:");
+	            JTextField txtAdresse = new JTextField(20);
+
+	            JLabel lblPays = new JLabel("Nouveau pays:");
+	            JTextField txtPays = new JTextField(20);
+
+	            JButton btnModifier = new JButton("Modifier");
+	            JButton btnRetour = new JButton("Retour");
+
+	            btnModifier.addActionListener(e -> {
+	                int id = Integer.parseInt(txtId.getText());
+	                String nom = txtNom.getText();
+	                String adresse = txtAdresse.getText();
+	                String pays = txtPays.getText();
+
+	                EditeurManager.modifierEditeur(id, adresse, pays, nom);
+	            });
+
+	            btnRetour.addActionListener(e -> {
+	                new FenetreBienvenue().setVisible(true);
+	                dispose();
+	            });
+
+	            setLayout(new GridLayout(5, 2));
+	            add(lblId); add(txtId);
+	            add(lblNom); add(txtNom);
+	            add(lblAdresse); add(txtAdresse);
+	            add(lblPays); add(txtPays);
+	            add(btnModifier); add(btnRetour);
+	        }
+	    }
+
+	    static class FenetreSupprimerEditeur extends JFrame {
+	        /**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			public FenetreSupprimerEditeur() {
+	            setTitle("Supprimer un éditeur");
+	            setSize(400, 200);
+	            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+	            setLocationRelativeTo(null);
+
+	            JLabel lblId = new JLabel("ID Éditeur:");
+	            JTextField txtId = new JTextField(10);
+	            JButton btnSupprimer = new JButton("Supprimer");
+	            JButton btnRetour = new JButton("Retour");
+
+	            btnSupprimer.addActionListener(e -> {
+	                int id = Integer.parseInt(txtId.getText());
+	                EditeurManager.supprimerEditeur(id);
+	            });
+
+	            btnRetour.addActionListener(e -> {
+	                new FenetreBienvenue().setVisible(true);
+	                dispose();
+	            });
+
+	            setLayout(new GridLayout(2, 2));
+	            add(lblId); add(txtId);
+	            add(btnSupprimer); add(btnRetour);
+	        }
+	    }
 		
-		JLabel editeur = new JLabel("Editeur:");
-		JTextField txtEditeur = new JTextField();
+		@Override
+		public String toString() {
+			return "";
+			
+		}
+    }
 
-		JButton btnAjouter = new JButton("Ajouter");
-		JButton btnAnnuler = new JButton("Annuler");
-
-		// Ajouter les champs et boutons au panneau
-		panel.add(lblTitre);
-		panel.add(txtTitre);
-		panel.add(lblAuteur);
-		panel.add(txtAuteur);
-		panel.add(lblAnnee);
-		panel.add(txtAnnee);
-		panel.add(stock);
-		panel.add(txtStock);
-		panel.add(price);
-		panel.add(txtPrice);
-		panel.add(editeur);
-		panel.add(txtEditeur);
-		panel.add(btnAjouter);
-		panel.add(btnAnnuler);
-
-		
-		//DocumentManager.ajouterDocument(lblTitre, lblAnnee, stock, price, editeur);
-		// Ajouter des écouteurs d'événements pour les boutons
-		btnAjouter.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String titre = txtTitre.getText();
-				String auteur = txtAuteur.getText();
-				String annee = txtAnnee.getText();
-
-				if (!titre.isEmpty() && !auteur.isEmpty() && !annee.isEmpty()) {
-					JOptionPane.showMessageDialog(null, "Livre ajouté :\n" +
-							"Titre: " + titre + "\nAuteur: " + auteur + "\nAnnée: " + annee);
-				} else {
-					JOptionPane.showMessageDialog(null, "Veuillez remplir tous les champs.", "Erreur", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-		});
-
-		btnAnnuler.addActionListener(e -> {
-			txtTitre.setText("");
-			txtAuteur.setText("");
-			txtAnnee.setText("");
-		});
-
-		return panel;
-	}
-
-
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(() -> {
-			Bibliotheque app = new Bibliotheque();
-			app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			app.setVisible(true);
-		});
-	}
-
-}
