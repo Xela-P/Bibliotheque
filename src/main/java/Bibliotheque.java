@@ -1,5 +1,10 @@
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -8,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,8 +24,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-
-
 public class Bibliotheque {
 
     public static void main(String[] args) {
@@ -28,25 +32,43 @@ public class Bibliotheque {
 
     // Fenêtre de bienvenue
     static class FenetreBienvenue extends JFrame {
-        /**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		public FenetreBienvenue() {
+        public FenetreBienvenue() {
             setTitle("Bienvenue dans la Bibliothèque");
-            setSize(1280, 720);
+            setSize(800, 600); // Taille uniforme pour toutes les fenêtres
             setDefaultCloseOperation(EXIT_ON_CLOSE);
             setLocationRelativeTo(null);
 
-            // Interface
+            // Couleurs
+            Color fondGris = Color.decode("#36393F"); // Couleur de fond gris similaire à Discord
+            Color bandeauTurquoise = Color.decode("#1ABC9C"); // Couleur du bandeau bleu turquoise
+
+            // Bandeau supérieur
+            JPanel panelBandeau = new JPanel();
+            panelBandeau.setBackground(bandeauTurquoise);
+            panelBandeau.setPreferredSize(new Dimension(getWidth(), 60));
             JLabel bienvenue = new JLabel("Bienvenue dans l'application Bibliothèque", JLabel.CENTER);
+            bienvenue.setForeground(Color.WHITE);
+            bienvenue.setFont(new Font("Arial", Font.BOLD, 20));
+            panelBandeau.add(bienvenue);
+
+            // Interface
             JButton btnAjout = new JButton("Ajouter un document");
             JButton btnRecherche = new JButton("Rechercher un document");
             JButton btnLister = new JButton("Lister les documents");
             JButton btnAjoutEditeur = new JButton("Ajouter un éditeur");
             JButton btnModifierEditeur = new JButton("Modifier un éditeur");
             JButton btnSupprimerEditeur = new JButton("Supprimer un éditeur");
+
+            // Réduire la taille des boutons
+            Dimension buttonSize = new Dimension(300, 60);
+            btnAjout.setPreferredSize(buttonSize);
+            btnRecherche.setPreferredSize(buttonSize);
+            btnLister.setPreferredSize(buttonSize);
+            btnAjoutEditeur.setPreferredSize(buttonSize);
+            btnModifierEditeur.setPreferredSize(buttonSize);
+            btnSupprimerEditeur.setPreferredSize(buttonSize);
 
             // Listeners
             btnAjout.addActionListener(e -> {
@@ -74,33 +96,61 @@ public class Bibliotheque {
                 dispose();
             });
 
-            // Layout
-            setLayout(new BorderLayout());
-            add(bienvenue, BorderLayout.CENTER);
-
+            // Panel pour centrer les boutons
             JPanel panelButtons = new JPanel();
-            panelButtons.add(btnAjout);
-            panelButtons.add(btnRecherche);
-            panelButtons.add(btnLister);
-            panelButtons.add(btnAjoutEditeur);
-            panelButtons.add(btnModifierEditeur);
-            panelButtons.add(btnSupprimerEditeur);
-            add(panelButtons, BorderLayout.SOUTH);
+            panelButtons.setLayout(new GridBagLayout());
+            panelButtons.setBorder(BorderFactory.createEmptyBorder(50, 100, 50, 100)); // Marge intérieure
+            panelButtons.setBackground(fondGris); // Fond gris pour le panel des boutons
+            setLayout(new BorderLayout());
+            add(panelBandeau, BorderLayout.NORTH);
+
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(10, 10, 10, 10); // Espacement entre les boutons
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            panelButtons.add(btnAjout, gbc);
+            gbc.gridx = 1;
+            panelButtons.add(btnRecherche, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            panelButtons.add(btnLister, gbc);
+            gbc.gridx = 1;
+            panelButtons.add(btnAjoutEditeur, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            panelButtons.add(btnModifierEditeur, gbc);
+            gbc.gridx = 1;
+            panelButtons.add(btnSupprimerEditeur, gbc);
+
+            add(panelButtons, BorderLayout.CENTER);
+
+            // Fond gris pour la fenêtre principale
+            getContentPane().setBackground(fondGris);
         }
     }
 
     // Fenêtre pour ajouter un document
     static class FenetreAjoutDocument extends JFrame {
-        /**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		public FenetreAjoutDocument() {
+        public FenetreAjoutDocument() {
             setTitle("Ajouter un document");
-            setSize(400, 300);
+            setSize(800, 600); // Taille uniforme pour toutes les fenêtres
             setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             setLocationRelativeTo(null);
+
+            // Couleurs
+            Color fondGris = Color.decode("#36393F"); // Couleur de fond gris similaire à Discord
+            Color bandeauTurquoise = Color.decode("#1ABC9C"); // Couleur du bandeau bleu turquoise
+
+            // Bandeau supérieur
+            JPanel panelBandeau = new JPanel();
+            panelBandeau.setBackground(bandeauTurquoise);
+            panelBandeau.setPreferredSize(new Dimension(getWidth(), 60));
+            JLabel bienvenue = new JLabel("Ajouter un document", JLabel.CENTER);
+            bienvenue.setForeground(Color.WHITE);
+            bienvenue.setFont(new Font("Arial", Font.BOLD, 20));
+            panelBandeau.add(bienvenue);
 
             // Interface
             JLabel lblTitre = new JLabel("Titre:");
@@ -120,6 +170,12 @@ public class Bibliotheque {
 
             JButton btnAjouter = new JButton("Ajouter");
             JButton btnRetour = new JButton("Retour");
+
+            // Réduire la taille des boutons
+            Dimension buttonSize = new Dimension(75, 15); // 2 fois plus petit
+            btnAjouter.setPreferredSize(buttonSize);
+            btnRetour.setPreferredSize(buttonSize);
+            btnRetour.setBackground(bandeauTurquoise); // Couleur turquoise pour le bouton "Retour"
 
             // Actions
             btnAjouter.addActionListener(e -> {
@@ -152,28 +208,71 @@ public class Bibliotheque {
             });
 
             // Layout
-            setLayout(new GridLayout(6, 2));
-            add(lblTitre); add(txtTitre);
-            add(lblDate); add(txtDate);
-            add(lblStock); add(txtStock);
-            add(lblPrix); add(txtPrix);
-            add(lblEditeur); add(txtEditeur);
-            add(btnAjouter); add(btnRetour);
+            setLayout(new BorderLayout());
+            add(panelBandeau, BorderLayout.NORTH);
+            JPanel panelForm = new JPanel();
+            panelForm.setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(10, 10, 10, 10); // Espacement entre les composants
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            panelForm.add(lblTitre, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtTitre, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            panelForm.add(lblDate, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtDate, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            panelForm.add(lblStock, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtStock, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            panelForm.add(lblPrix, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtPrix, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 4;
+            panelForm.add(lblEditeur, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtEditeur, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 5;
+            panelForm.add(btnAjouter, gbc);
+            gbc.gridx = 1;
+            panelForm.add(btnRetour, gbc);
+            add(panelForm, BorderLayout.CENTER);
+
+            // Fond gris pour la fenêtre
+            getContentPane().setBackground(fondGris);
         }
     }
 
     // Fenêtre pour rechercher un document
     static class FenetreRechercheDocument extends JFrame {
-        /**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		public FenetreRechercheDocument() {
+        public FenetreRechercheDocument() {
             setTitle("Rechercher un document");
-            setSize(600, 400);
+            setSize(800, 600); // Taille uniforme pour toutes les fenêtres
             setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             setLocationRelativeTo(null);
+
+            // Couleurs
+            Color fondGris = Color.decode("#36393F"); // Couleur de fond gris similaire à Discord
+            Color bandeauTurquoise = Color.decode("#1ABC9C"); // Couleur du bandeau bleu turquoise
+
+            // Bandeau supérieur
+            JPanel panelBandeau = new JPanel();
+            panelBandeau.setBackground(bandeauTurquoise);
+            panelBandeau.setPreferredSize(new Dimension(getWidth(), 60));
+            JLabel bienvenue = new JLabel("Rechercher un document", JLabel.CENTER);
+            bienvenue.setForeground(Color.WHITE);
+            bienvenue.setFont(new Font("Arial", Font.BOLD, 20));
+            panelBandeau.add(bienvenue);
 
             // Interface
             JLabel lblTitre = new JLabel("Titre:");
@@ -183,9 +282,15 @@ public class Bibliotheque {
             JTextArea txtResultat = new JTextArea();
             txtResultat.setEditable(false);
 
+            // Réduire la taille des boutons
+            Dimension buttonSize = new Dimension(75, 15); // 2 fois plus petit
+            btnRechercher.setPreferredSize(buttonSize);
+            btnRetour.setPreferredSize(buttonSize);
+            btnRetour.setBackground(bandeauTurquoise); // Couleur turquoise pour le bouton "Retour"
+
             btnRechercher.addActionListener(e -> {
                 String titre = txtTitre.getText();
-                List<String > result = DocumentManager.rechercherDocumentParTitre(titre);
+                List<String> result = DocumentManager.rechercherDocumentParTitre(titre);
                 txtResultat.setText(result.toString());
             });
 
@@ -196,31 +301,59 @@ public class Bibliotheque {
 
             // Layout
             setLayout(new BorderLayout());
+            add(panelBandeau, BorderLayout.NORTH);
             JPanel panelRecherche = new JPanel();
-            panelRecherche.add(lblTitre); panelRecherche.add(txtTitre); panelRecherche.add(btnRechercher);
+            panelRecherche.setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(10, 10, 10, 10); // Espacement entre les composants
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            panelRecherche.add(lblTitre, gbc);
+            gbc.gridx = 1;
+            panelRecherche.add(txtTitre, gbc);
+            gbc.gridx = 2;
+            panelRecherche.add(btnRechercher, gbc);
             add(panelRecherche, BorderLayout.NORTH);
             add(new JScrollPane(txtResultat), BorderLayout.CENTER);
             add(btnRetour, BorderLayout.SOUTH);
+
+            // Fond gris pour la fenêtre
+            getContentPane().setBackground(fondGris);
         }
     }
 
     // Fenêtre pour lister tous les documents
     static class FenetreListeDocuments extends JFrame {
-        /**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-		public FenetreListeDocuments() {
+        public FenetreListeDocuments() {
             setTitle("Liste des documents");
-            setSize(600, 400);
+            setSize(800, 600); // Taille uniforme pour toutes les fenêtres
             setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             setLocationRelativeTo(null);
+
+            // Couleurs
+            Color fondGris = Color.decode("#36393F"); // Couleur de fond gris similaire à Discord
+            Color bandeauTurquoise = Color.decode("#1ABC9C"); // Couleur du bandeau bleu turquoise
+
+            // Bandeau supérieur
+            JPanel panelBandeau = new JPanel();
+            panelBandeau.setBackground(bandeauTurquoise);
+            panelBandeau.setPreferredSize(new Dimension(getWidth(), 60));
+            JLabel bienvenue = new JLabel("Liste des documents", JLabel.CENTER);
+            bienvenue.setForeground(Color.WHITE);
+            bienvenue.setFont(new Font("Arial", Font.BOLD, 20));
+            panelBandeau.add(bienvenue);
 
             // Interface
             JTextArea txtResultat = new JTextArea();
             txtResultat.setEditable(false);
             JButton btnRetour = new JButton("Retour");
+
+            // Réduire la taille des boutons
+            Dimension buttonSize = new Dimension(75, 15); // 2 fois plus petit
+            btnRetour.setPreferredSize(buttonSize);
+            btnRetour.setBackground(bandeauTurquoise); // Couleur turquoise pour le bouton "Retour"
 
             btnRetour.addActionListener(e -> {
                 new FenetreBienvenue().setVisible(true);
@@ -244,147 +377,272 @@ public class Bibliotheque {
 
             // Layout
             setLayout(new BorderLayout());
+            add(panelBandeau, BorderLayout.NORTH);
             add(new JScrollPane(txtResultat), BorderLayout.CENTER);
             add(btnRetour, BorderLayout.SOUTH);
+
+            // Fond gris pour la fenêtre
+            getContentPane().setBackground(fondGris);
         }
     }
-		
-		static class FenetreAjoutEditeur extends JFrame {
-	        /**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
 
-			public FenetreAjoutEditeur() {
-	            setTitle("Ajouter un éditeur");
-	            setSize(400, 300);
-	            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-	            setLocationRelativeTo(null);
+    static class FenetreAjoutEditeur extends JFrame {
+        private static final long serialVersionUID = 1L;
 
-	            JLabel lblId = new JLabel("ID Éditeur:");
-	            JTextField txtId = new JTextField(10);
+        public FenetreAjoutEditeur() {
+            setTitle("Ajouter un éditeur");
+            setSize(800, 600); // Taille uniforme pour toutes les fenêtres
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            setLocationRelativeTo(null);
 
-	            JLabel lblNom = new JLabel("Nom:");
-	            JTextField txtNom = new JTextField(20);
+            // Couleurs
+            Color fondGris = Color.decode("#36393F"); // Couleur de fond gris similaire à Discord
+            Color bandeauTurquoise = Color.decode("#1ABC9C"); // Couleur du bandeau bleu turquoise
 
-	            JLabel lblAdresse = new JLabel("Adresse:");
-	            JTextField txtAdresse = new JTextField(20);
+            // Bandeau supérieur
+            JPanel panelBandeau = new JPanel();
+            panelBandeau.setBackground(bandeauTurquoise);
+            panelBandeau.setPreferredSize(new Dimension(getWidth(), 60));
+            JLabel bienvenue = new JLabel("Ajouter un éditeur", JLabel.CENTER);
+            bienvenue.setForeground(Color.WHITE);
+            bienvenue.setFont(new Font("Arial", Font.BOLD, 20));
+            panelBandeau.add(bienvenue);
 
-	            JLabel lblPays = new JLabel("Pays:");
-	            JTextField txtPays = new JTextField(20);
+            JLabel lblId = new JLabel("ID Éditeur:");
+            JTextField txtId = new JTextField(10);
 
-	            JButton btnAjouter = new JButton("Ajouter");
-	            JButton btnRetour = new JButton("Retour");
+            JLabel lblNom = new JLabel("Nom:");
+            JTextField txtNom = new JTextField(20);
 
-	            btnAjouter.addActionListener(e -> {
-	                int id = Integer.parseInt(txtId.getText());
-	                String nom = txtNom.getText();
-	                String adresse = txtAdresse.getText();
-	                String pays = txtPays.getText();
+            JLabel lblAdresse = new JLabel("Adresse:");
+            JTextField txtAdresse = new JTextField(20);
 
-	               EditeurManager.ajouterEditeur(id, adresse, pays, nom);
-	            });
-	            btnRetour.addActionListener(e -> {
-	                new FenetreBienvenue().setVisible(true);
-	                dispose();
-	            });
+            JLabel lblPays = new JLabel("Pays:");
+            JTextField txtPays = new JTextField(20);
 
-	            setLayout(new GridLayout(5, 2));
-	            add(lblId); add(txtId);
-	            add(lblNom); add(txtNom);
-	            add(lblAdresse); add(txtAdresse);
-	            add(lblPays); add(txtPays);
-	            add(btnAjouter); add(btnRetour);
-	        }
-	    }
+            JButton btnAjouter = new JButton("Ajouter");
+            JButton btnRetour = new JButton("Retour");
 
-	    static class FenetreModifierEditeur extends JFrame {
-	        /**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
+            // Réduire la taille des boutons
+            Dimension buttonSize = new Dimension(75, 15); // 2 fois plus petit
+            btnAjouter.setPreferredSize(buttonSize);
+            btnRetour.setPreferredSize(buttonSize);
+            btnRetour.setBackground(bandeauTurquoise); // Couleur turquoise pour le bouton "Retour"
 
-			public FenetreModifierEditeur() {
-	            setTitle("Modifier un éditeur");
-	            setSize(400, 300);
-	            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-	            setLocationRelativeTo(null);
+            btnAjouter.addActionListener(e -> {
+                int id = Integer.parseInt(txtId.getText());
+                String nom = txtNom.getText();
+                String adresse = txtAdresse.getText();
+                String pays = txtPays.getText();
 
-	            JLabel lblId = new JLabel("ID Éditeur:");
-	            JTextField txtId = new JTextField(10);
+                EditeurManager.ajouterEditeur(id, adresse, pays, nom);
+            });
+            btnRetour.addActionListener(e -> {
+                new FenetreBienvenue().setVisible(true);
+                dispose();
+            });
 
-	            JLabel lblNom = new JLabel("Nouveau nom:");
-	            JTextField txtNom = new JTextField(20);
+            setLayout(new BorderLayout());
+            add(panelBandeau, BorderLayout.NORTH);
+            JPanel panelForm = new JPanel();
+            panelForm.setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(10, 10, 10, 10); // Espacement entre les composants
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            panelForm.add(lblId, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtId, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            panelForm.add(lblNom, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtNom, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            panelForm.add(lblAdresse, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtAdresse, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            panelForm.add(lblPays, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtPays, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 4;
+            panelForm.add(btnAjouter, gbc);
+            gbc.gridx = 1;
+            panelForm.add(btnRetour, gbc);
+            add(panelForm, BorderLayout.CENTER);
 
-	            JLabel lblAdresse = new JLabel("Nouvelle adresse:");
-	            JTextField txtAdresse = new JTextField(20);
-
-	            JLabel lblPays = new JLabel("Nouveau pays:");
-	            JTextField txtPays = new JTextField(20);
-
-	            JButton btnModifier = new JButton("Modifier");
-	            JButton btnRetour = new JButton("Retour");
-
-	            btnModifier.addActionListener(e -> {
-	                int id = Integer.parseInt(txtId.getText());
-	                String nom = txtNom.getText();
-	                String adresse = txtAdresse.getText();
-	                String pays = txtPays.getText();
-
-	                EditeurManager.modifierEditeur(id, adresse, pays, nom);
-	            });
-
-	            btnRetour.addActionListener(e -> {
-	                new FenetreBienvenue().setVisible(true);
-	                dispose();
-	            });
-
-	            setLayout(new GridLayout(5, 2));
-	            add(lblId); add(txtId);
-	            add(lblNom); add(txtNom);
-	            add(lblAdresse); add(txtAdresse);
-	            add(lblPays); add(txtPays);
-	            add(btnModifier); add(btnRetour);
-	        }
-	    }
-
-	    static class FenetreSupprimerEditeur extends JFrame {
-	        /**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			public FenetreSupprimerEditeur() {
-	            setTitle("Supprimer un éditeur");
-	            setSize(400, 200);
-	            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-	            setLocationRelativeTo(null);
-
-	            JLabel lblId = new JLabel("ID Éditeur:");
-	            JTextField txtId = new JTextField(10);
-	            JButton btnSupprimer = new JButton("Supprimer");
-	            JButton btnRetour = new JButton("Retour");
-
-	            btnSupprimer.addActionListener(e -> {
-	                int id = Integer.parseInt(txtId.getText());
-	                EditeurManager.supprimerEditeur(id);
-	            });
-
-	            btnRetour.addActionListener(e -> {
-	                new FenetreBienvenue().setVisible(true);
-	                dispose();
-	            });
-
-	            setLayout(new GridLayout(2, 2));
-	            add(lblId); add(txtId);
-	            add(btnSupprimer); add(btnRetour);
-	        }
-	    }
-		
-		@Override
-		public String toString() {
-			return "";
-			
-		}
+            // Fond gris pour la fenêtre
+            getContentPane().setBackground(fondGris);
+        }
     }
 
+    static class FenetreModifierEditeur extends JFrame {
+        private static final long serialVersionUID = 1L;
+
+        public FenetreModifierEditeur() {
+            setTitle("Modifier un éditeur");
+            setSize(800, 600); // Taille uniforme pour toutes les fenêtres
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            setLocationRelativeTo(null);
+
+            // Couleurs
+            Color fondGris = Color.decode("#36393F"); // Couleur de fond gris similaire à Discord
+            Color bandeauTurquoise = Color.decode("#1ABC9C"); // Couleur du bandeau bleu turquoise
+
+            // Bandeau supérieur
+            JPanel panelBandeau = new JPanel();
+            panelBandeau.setBackground(bandeauTurquoise);
+            panelBandeau.setPreferredSize(new Dimension(getWidth(), 60));
+            JLabel bienvenue = new JLabel("Modifier un éditeur", JLabel.CENTER);
+            bienvenue.setForeground(Color.WHITE);
+            bienvenue.setFont(new Font("Arial", Font.BOLD, 20));
+            panelBandeau.add(bienvenue);
+
+            JLabel lblId = new JLabel("ID Éditeur:");
+            JTextField txtId = new JTextField(10);
+
+            JLabel lblNom = new JLabel("Nouveau nom:");
+            JTextField txtNom = new JTextField(20);
+
+            JLabel lblAdresse = new JLabel("Nouvelle adresse:");
+            JTextField txtAdresse = new JTextField(20);
+
+            JLabel lblPays = new JLabel("Nouveau pays:");
+            JTextField txtPays = new JTextField(20);
+
+            JButton btnModifier = new JButton("Modifier");
+            JButton btnRetour = new JButton("Retour");
+
+            // Réduire la taille des boutons
+            Dimension buttonSize = new Dimension(75, 15); // 2 fois plus petit
+            btnModifier.setPreferredSize(buttonSize);
+            btnRetour.setPreferredSize(buttonSize);
+            btnRetour.setBackground(bandeauTurquoise); // Couleur turquoise pour le bouton "Retour"
+
+            btnModifier.addActionListener(e -> {
+                int id = Integer.parseInt(txtId.getText());
+                String nom = txtNom.getText();
+                String adresse = txtAdresse.getText();
+                String pays = txtPays.getText();
+
+                EditeurManager.modifierEditeur(id, adresse, pays, nom);
+            });
+
+            btnRetour.addActionListener(e -> {
+                new FenetreBienvenue().setVisible(true);
+                dispose();
+            });
+
+            setLayout(new BorderLayout());
+            add(panelBandeau, BorderLayout.NORTH);
+            JPanel panelForm = new JPanel();
+            panelForm.setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(10, 10, 10, 10); // Espacement entre les composants
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            panelForm.add(lblId, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtId, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            panelForm.add(lblNom, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtNom, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            panelForm.add(lblAdresse, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtAdresse, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            panelForm.add(lblPays, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtPays, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 4;
+            panelForm.add(btnModifier, gbc);
+            gbc.gridx = 1;
+            panelForm.add(btnRetour, gbc);
+            add(panelForm, BorderLayout.CENTER);
+
+            // Fond gris pour la fenêtre
+            getContentPane().setBackground(fondGris);
+        }
+    }
+
+    static class FenetreSupprimerEditeur extends JFrame {
+        private static final long serialVersionUID = 1L;
+
+        public FenetreSupprimerEditeur() {
+            setTitle("Supprimer un éditeur");
+            setSize(800, 600); // Taille uniforme pour toutes les fenêtres
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            setLocationRelativeTo(null);
+
+            // Couleurs
+            Color fondGris = Color.decode("#36393F"); // Couleur de fond gris similaire à Discord
+            Color bandeauTurquoise = Color.decode("#1ABC9C"); // Couleur du bandeau bleu turquoise
+
+            // Bandeau supérieur
+            JPanel panelBandeau = new JPanel();
+            panelBandeau.setBackground(bandeauTurquoise);
+            panelBandeau.setPreferredSize(new Dimension(getWidth(), 60));
+            JLabel bienvenue = new JLabel("Supprimer un éditeur", JLabel.CENTER);
+            bienvenue.setForeground(Color.WHITE);
+            bienvenue.setFont(new Font("Arial", Font.BOLD, 20));
+            panelBandeau.add(bienvenue);
+
+            JLabel lblId = new JLabel("ID Éditeur:");
+            JTextField txtId = new JTextField(10);
+            JButton btnSupprimer = new JButton("Supprimer");
+            JButton btnRetour = new JButton("Retour");
+
+            // Réduire la taille des boutons
+            Dimension buttonSize = new Dimension(75, 15); // 2 fois plus petit
+            btnSupprimer.setPreferredSize(buttonSize);
+            btnRetour.setPreferredSize(buttonSize);
+            btnRetour.setBackground(bandeauTurquoise); // Couleur turquoise pour le bouton "Retour"
+
+            btnSupprimer.addActionListener(e -> {
+                int id = Integer.parseInt(txtId.getText());
+                EditeurManager.supprimerEditeur(id);
+            });
+
+            btnRetour.addActionListener(e -> {
+                new FenetreBienvenue().setVisible(true);
+                dispose();
+            });
+
+            setLayout(new BorderLayout());
+            add(panelBandeau, BorderLayout.NORTH);
+            JPanel panelForm = new JPanel();
+            panelForm.setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(10, 10, 10, 10); // Espacement entre les composants
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            panelForm.add(lblId, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtId, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            panelForm.add(btnSupprimer, gbc);
+            gbc.gridx = 1;
+            panelForm.add(btnRetour, gbc);
+            add(panelForm, BorderLayout.CENTER);
+
+            // Fond gris pour la fenêtre
+            getContentPane().setBackground(fondGris);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "";
+    }
+}
