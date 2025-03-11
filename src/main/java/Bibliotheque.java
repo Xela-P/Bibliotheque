@@ -7,7 +7,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -60,6 +59,9 @@ public class Bibliotheque {
             JButton btnAjoutEditeur = new JButton("Ajouter un éditeur");
             JButton btnModifierEditeur = new JButton("Modifier un éditeur");
             JButton btnSupprimerEditeur = new JButton("Supprimer un éditeur");
+            JButton btnAjoutUtilisateur = new JButton("Ajouter un utilisateur");
+            JButton btnModifierUtilisateur = new JButton("Modifier un utilisateur");
+            JButton btnSupprimerUtilisateur = new JButton("Supprimer un utilisateur");
 
             // Réduire la taille des boutons
             Dimension buttonSize = new Dimension(300, 60);
@@ -69,6 +71,9 @@ public class Bibliotheque {
             btnAjoutEditeur.setPreferredSize(buttonSize);
             btnModifierEditeur.setPreferredSize(buttonSize);
             btnSupprimerEditeur.setPreferredSize(buttonSize);
+            btnAjoutUtilisateur.setPreferredSize(buttonSize);
+            btnModifierUtilisateur.setPreferredSize(buttonSize);
+            btnSupprimerUtilisateur.setPreferredSize(buttonSize);
 
             // Listeners
             btnAjout.addActionListener(e -> {
@@ -93,6 +98,10 @@ public class Bibliotheque {
             });
             btnSupprimerEditeur.addActionListener(e -> {
                 new FenetreSupprimerEditeur().setVisible(true);
+                dispose();
+            });
+            btnAjoutUtilisateur.addActionListener(e -> {
+                new FenetreAjoutUtilisateur().setVisible(true);
                 dispose();
             });
 
@@ -121,6 +130,8 @@ public class Bibliotheque {
             panelButtons.add(btnModifierEditeur, gbc);
             gbc.gridx = 1;
             panelButtons.add(btnSupprimerEditeur, gbc);
+            gbc.gridx = 5;
+            panelButtons.add(btnAjoutUtilisateur, gbc);
 
             add(panelButtons, BorderLayout.CENTER);
 
@@ -179,24 +190,28 @@ public class Bibliotheque {
 
             // Actions
             btnAjouter.addActionListener(e -> {
-                String titre = txtTitre.getText();
-                String datePublication = txtDate.getText();
-                int stock = Integer.parseInt(txtStock.getText());
-                double prix = Double.parseDouble(txtPrix.getText());
-                int idEditeur = Integer.parseInt(txtEditeur.getText());
+                try {
+                    String titre = txtTitre.getText();
+                    String datePublication = txtDate.getText();
+                    int stock = Integer.parseInt(txtStock.getText());
+                    double prix = Double.parseDouble(txtPrix.getText());
+                    int idEditeur = Integer.parseInt(txtEditeur.getText());
 
-                String query = "INSERT INTO Document (Titre, DatePublication, Stock, Prix, idEditeur) VALUES (?, ?, ?, ?, ?)";
-                try (Connection conn = DatabaseManager.getConnection();
-                     PreparedStatement stmt = conn.prepareStatement(query)) {
+                    String query = "INSERT INTO Document (Titre, DatePublication, Stock, Prix, idEditeur) VALUES (?, ?, ?, ?, ?)";
+                    try (Connection conn = DatabaseManager.getConnection();
+                         PreparedStatement stmt = conn.prepareStatement(query)) {
 
-                    stmt.setString(1, titre);
-                    stmt.setDate(2, Date.valueOf(datePublication));
-                    stmt.setInt(3, stock);
-                    stmt.setDouble(4, prix);
-                    stmt.setInt(5, idEditeur);
-                    stmt.executeUpdate();
+                        stmt.setString(1, titre);
+                        stmt.setDate(2, Date.valueOf(datePublication));
+                        stmt.setInt(3, stock);
+                        stmt.setDouble(4, prix);
+                        stmt.setInt(5, idEditeur);
+                        stmt.executeUpdate();
 
-                    JOptionPane.showMessageDialog(this, "Document ajouté avec succès !");
+                        JOptionPane.showMessageDialog(this, "Document ajouté avec succès !");
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Veuillez entrer des valeurs numériques valides.");
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout : " + ex.getMessage());
                 }
@@ -363,9 +378,9 @@ public class Bibliotheque {
             // Charger les documents
             String query = "SELECT * FROM Document";
             try (Connection conn = DatabaseManager.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(query)) {
+                 PreparedStatement stmt = conn.prepareStatement(query);
+                 ResultSet rs = stmt.executeQuery()) {
 
-                ResultSet rs = stmt.executeQuery();
                 while (rs.next()) {
                     txtResultat.append("ID: " + rs.getInt("idDoc") + ", Titre: " + rs.getString("Titre") +
                             ", Date: " + rs.getDate("DatePublication") + ", Stock: " + rs.getInt("Stock") +
@@ -430,12 +445,16 @@ public class Bibliotheque {
             btnRetour.setBackground(bandeauTurquoise); // Couleur turquoise pour le bouton "Retour"
 
             btnAjouter.addActionListener(e -> {
-                int id = Integer.parseInt(txtId.getText());
-                String nom = txtNom.getText();
-                String adresse = txtAdresse.getText();
-                String pays = txtPays.getText();
+                try {
+                    int id = Integer.parseInt(txtId.getText());
+                    String nom = txtNom.getText();
+                    String adresse = txtAdresse.getText();
+                    String pays = txtPays.getText();
 
-                EditeurManager.ajouterEditeur(id, adresse, pays, nom);
+                    EditeurManager.ajouterEditeur(id, adresse, pays, nom);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Veuillez entrer un ID valide.");
+                }
             });
             btnRetour.addActionListener(e -> {
                 new FenetreBienvenue().setVisible(true);
@@ -524,12 +543,16 @@ public class Bibliotheque {
             btnRetour.setBackground(bandeauTurquoise); // Couleur turquoise pour le bouton "Retour"
 
             btnModifier.addActionListener(e -> {
-                int id = Integer.parseInt(txtId.getText());
-                String nom = txtNom.getText();
-                String adresse = txtAdresse.getText();
-                String pays = txtPays.getText();
+                try {
+                    int id = Integer.parseInt(txtId.getText());
+                    String nom = txtNom.getText();
+                    String adresse = txtAdresse.getText();
+                    String pays = txtPays.getText();
 
-                EditeurManager.modifierEditeur(id, adresse, pays, nom);
+                    EditeurManager.modifierEditeur(id, adresse, pays, nom);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Veuillez entrer un ID valide.");
+                }
             });
 
             btnRetour.addActionListener(e -> {
@@ -609,8 +632,12 @@ public class Bibliotheque {
             btnRetour.setBackground(bandeauTurquoise); // Couleur turquoise pour le bouton "Retour"
 
             btnSupprimer.addActionListener(e -> {
-                int id = Integer.parseInt(txtId.getText());
-                EditeurManager.supprimerEditeur(id);
+                try {
+                    int id = Integer.parseInt(txtId.getText());
+                    EditeurManager.supprimerEditeur(id);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Veuillez entrer un ID valide.");
+                }
             });
 
             btnRetour.addActionListener(e -> {
@@ -632,6 +659,142 @@ public class Bibliotheque {
             gbc.gridx = 0;
             gbc.gridy = 1;
             panelForm.add(btnSupprimer, gbc);
+            gbc.gridx = 1;
+            panelForm.add(btnRetour, gbc);
+            add(panelForm, BorderLayout.CENTER);
+
+            // Fond gris pour la fenêtre
+            getContentPane().setBackground(fondGris);
+        }
+    }
+
+    static class FenetreAjoutUtilisateur extends JFrame {
+        private static final long serialVersionUID = 1L;
+
+        public FenetreAjoutUtilisateur() {
+            setTitle("Ajouter un utilisateur");
+            setSize(800, 600); // Taille uniforme pour toutes les fenêtres
+            setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+            setLocationRelativeTo(null);
+
+            // Couleurs
+            Color fondGris = Color.decode("#36393F"); // Couleur de fond gris similaire à Discord
+            Color bandeauTurquoise = Color.decode("#1ABC9C"); // Couleur du bandeau bleu turquoise
+
+            // Bandeau supérieur
+            JPanel panelBandeau = new JPanel();
+            panelBandeau.setBackground(bandeauTurquoise);
+            panelBandeau.setPreferredSize(new Dimension(getWidth(), 60));
+            JLabel bienvenue = new JLabel("Ajouter un utilisateur", JLabel.CENTER);
+            bienvenue.setForeground(Color.WHITE);
+            bienvenue.setFont(new Font("Arial", Font.BOLD, 20));
+            panelBandeau.add(bienvenue);
+
+            JLabel lblId = new JLabel("ID utilisateur:");
+            JTextField txtId = new JTextField(10);
+
+            JLabel lblNom = new JLabel("Nom:");
+            JTextField txtNom = new JTextField(50);
+
+            JLabel lblPrenom = new JLabel("Prenom:");
+            JTextField txtPrenom = new JTextField(50);
+
+            JLabel lblAge = new JLabel("Age:");
+            JTextField txtAge = new JTextField(3);
+
+            JLabel lblAdresse = new JLabel("Adresse:");
+            JTextField txtAdresse = new JTextField(100);
+
+            JLabel lblMail = new JLabel("Adresse Mail:");
+            JTextField txtMail = new JTextField(50);
+
+            JLabel lblTel = new JLabel("Telephone:");
+            JTextField txtTel = new JTextField(15);
+
+            JButton btnAjouter = new JButton("Ajouter");
+            JButton btnRetour = new JButton("Retour");
+
+            // Réduire la taille des boutons
+            Dimension buttonSize = new Dimension(75, 15); // 2 fois plus petit
+            btnAjouter.setPreferredSize(buttonSize);
+            btnRetour.setPreferredSize(buttonSize);
+            btnRetour.setBackground(bandeauTurquoise); // Couleur turquoise pour le bouton "Retour"
+
+            btnAjouter.addActionListener(e -> {
+                try {
+                    int id = Integer.parseInt(txtId.getText());
+                    String nom = txtNom.getText();
+                    String prenom = txtPrenom.getText();
+                    String categorie = "Mineur";
+                    int age = Integer.parseInt(txtAge.getText());
+                    String adresse = txtAdresse.getText();
+                    String mail = txtMail.getText();
+                    String tel = txtTel.getText();
+                    if (age >= 18) {
+                        categorie = "Majeur";
+                    }
+
+                    UtilisateurManager.ajouterUtilisateur(id, nom, prenom, adresse, categorie, age, mail, tel);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Veuillez entrer des valeurs numériques valides.");
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout : " + ex.getMessage());
+                }
+            });
+            btnRetour.addActionListener(e -> {
+                new FenetreBienvenue().setVisible(true);
+                dispose();
+            });
+
+            setLayout(new BorderLayout());
+            add(panelBandeau, BorderLayout.NORTH);
+            JPanel panelForm = new JPanel();
+            panelForm.setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(10, 10, 10, 10); // Espacement entre les composants
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            panelForm.add(lblId, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtId, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            panelForm.add(lblNom, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtNom, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            panelForm.add(lblAdresse, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtAdresse, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            panelForm.add(lblTel, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtTel, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 4;
+            panelForm.add(lblMail, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtMail, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 5;
+            panelForm.add(lblTel, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtTel, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 6;
+            panelForm.add(lblPrenom, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtPrenom, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 7;
+            panelForm.add(lblAge, gbc);
+            gbc.gridx = 1;
+            panelForm.add(txtAge, gbc);
+            gbc.gridx = 0;
+            gbc.gridy = 8;
+            panelForm.add(btnAjouter, gbc);
             gbc.gridx = 1;
             panelForm.add(btnRetour, gbc);
             add(panelForm, BorderLayout.CENTER);
